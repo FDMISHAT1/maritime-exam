@@ -38,6 +38,12 @@ button { font: inherit; }
 .eyebrow { display: inline-block; padding: 8px 14px; border-radius: 999px; color: var(--blue); background: var(--light-blue); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; }
 h1 { margin: 18px 0 10px; font-size: clamp(36px, 6vw, 62px); line-height: 1.03; letter-spacing: -.045em; }
 .lead { max-width: 600px; margin: 0 auto; color: var(--muted); font-size: 18px; line-height: 1.6; }
+.length-picker { align-items: center; background: #f4f7fa; border: 1px solid #dde5ec; border-radius: 16px; display: flex; justify-content: space-between; margin: 24px 0; padding: 12px 14px; }
+.length-picker > span { color: #516170; font-size: 14px; font-weight: 700; }
+.length-picker > div { display: flex; gap: 6px; }
+.length-picker button { background: #fff; border: 1px solid #d5dee7; border-radius: 9px; color: #344553; cursor: pointer; font-weight: 700; min-width: 42px; padding: 8px 10px; }
+.length-picker button.active { background: var(--blue); border-color: var(--blue); color: #fff; }
+.length-picker button:disabled { cursor: not-allowed; opacity: .35; }
 .mode-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 42px; }
 .mode-card { min-height: 176px; padding: 24px; display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-end; gap: 6px; border: 1px solid var(--line); border-radius: 22px; background: var(--paper); color: var(--navy); cursor: pointer; text-align: left; box-shadow: 0 12px 30px rgba(16,35,63,.05); transition: transform .18s, box-shadow .18s; }
 .mode-card:hover:not(:disabled) { transform: translateY(-4px); box-shadow: 0 18px 36px rgba(16,35,63,.11); }

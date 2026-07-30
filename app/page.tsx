@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 type Question = {
   id: number;
@@ -50,18 +50,18 @@ function sameAnswers(selected: number[], correct: number[]) {
 
 export default function Home() {
   const [screen, setScreen] = useState<Screen>("start");
+  const [testLength, setTestLength] = useState(20);
   const [order, setOrder] = useState<number[]>([]);
   const [position, setPosition] = useState(0);
   const [selected, setSelected] = useState<number[]>([]);
   const [confirmed, setConfirmed] = useState(false);
   const [correctCount, setCorrectCount] = useState(0);
   const [mistakes, setMistakes] = useState<number[]>([]);
-  const [savedMistakes, setSavedMistakes] = useState<number[]>([]);
-
-  useEffect(() => {
+  const [savedMistakes, setSavedMistakes] = useState<number[]>(() => {
+    if (typeof window === "undefined") return [];
     const saved = localStorage.getItem("maritime-exam-mistakes");
-    if (saved) setSavedMistakes(JSON.parse(saved));
-  }, []);
+    return saved ? JSON.parse(saved) : [];
+  });
 
   const question = QUESTIONS.find((item) => item.id === order[position]);
   const percent = order.length ? Math.round((position / order.length) * 100) : 0;
@@ -138,11 +138,32 @@ export default function Home() {
           <div className="eyebrow">Подготовка без зубрёжки</div>
           <h1>Готова проверить знания?</h1>
           <p className="lead">Выбирай ответы, сразу разбирай ошибки и возвращайся к сложным вопросам.</p>
+          <div className="length-picker" aria-label="Количество вопросов в тесте">
+            <span>Вопросов в тесте</span>
+            <div>
+              {[10, 20, 50].map((length) => (
+                <button
+                  key={length}
+                  className={testLength === length ? "active" : ""}
+                  disabled={length > QUESTIONS.length}
+                  onClick={() => setTestLength(length)}
+                >
+                  {length}
+                </button>
+              ))}
+              <button
+                className={testLength === QUESTIONS.length ? "active" : ""}
+                onClick={() => setTestLength(QUESTIONS.length)}
+              >
+                Все
+              </button>
+            </div>
+          </div>
           <div className="mode-grid">
-            <button className="mode-card primary" onClick={() => begin(QUESTIONS, Math.min(20, QUESTIONS.length))}>
+            <button className="mode-card primary" onClick={() => begin(QUESTIONS, Math.min(testLength, QUESTIONS.length))}>
               <span className="mode-icon">▶</span>
               <b>Начать тест</b>
-              <small>20 случайных вопросов</small>
+              <small>{Math.min(testLength, QUESTIONS.length)} случайных вопросов</small>
             </button>
             <button className="mode-card" onClick={() => begin(QUESTIONS)}>
               <span className="mode-icon">∞</span>
@@ -209,7 +230,7 @@ export default function Home() {
           <h1>{correctCount === order.length ? "Идеально!" : correctCount / order.length >= 0.8 ? "Очень хорошо!" : "Продолжаем тренировку"}</h1>
           <p>Правильных ответов: <b>{correctCount} из {order.length}</b></p>
           <div className="result-actions">
-            <button className="main-button" onClick={() => begin(QUESTIONS, Math.min(20, QUESTIONS.length))}>Пройти ещё раз</button>
+            <button className="main-button" onClick={() => begin(QUESTIONS, Math.min(testLength, QUESTIONS.length))}>Пройти ещё раз</button>
             <button className="secondary-button" onClick={() => setScreen("start")}>На главную</button>
           </div>
         </section>

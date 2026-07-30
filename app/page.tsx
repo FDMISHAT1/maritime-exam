@@ -312,7 +312,7 @@ const QUESTIONS: Question[] = [
   { id: 310, text: "Какой звуковой сигнал означает изменение курса вправо?", answers: ["Один короткий звук", "Два коротких звука", "Три коротких звука", "Один продолжительный звук"], correct: [0] },
 ];
 
-type Screen = "start" | "quiz" | "result";
+type Screen = "start" | "quiz" | "result" | "catalog";
 
 function sameAnswers(selected: number[], correct: number[]) {
   return selected.length === correct.length && selected.every((item) => correct.includes(item));
@@ -321,6 +321,7 @@ function sameAnswers(selected: number[], correct: number[]) {
 export default function Home() {
   const [screen, setScreen] = useState<Screen>("start");
   const [testLength, setTestLength] = useState(20);
+  const [catalogSearch, setCatalogSearch] = useState("");
   const [order, setOrder] = useState<number[]>([]);
   const [position, setPosition] = useState(0);
   const [selected, setSelected] = useState<number[]>([]);
@@ -342,6 +343,16 @@ export default function Home() {
     () => QUESTIONS.filter((item) => savedMistakes.includes(item.id)),
     [savedMistakes],
   );
+  const catalogQuestions = useMemo(() => {
+    const query = catalogSearch.trim().toLocaleLowerCase("ru");
+    if (!query) return QUESTIONS;
+    return QUESTIONS.filter(
+      (item) =>
+        String(item.id).includes(query) ||
+        item.text.toLocaleLowerCase("ru").includes(query) ||
+        item.answers.some((answer) => answer.toLocaleLowerCase("ru").includes(query)),
+    );
+  }, [catalogSearch]);
 
   function begin(source: Question[], limit = source.length) {
     const shuffled = [...source].sort(() => Math.random() - 0.5).slice(0, limit);
@@ -447,7 +458,48 @@ export default function Home() {
             </button>
           </div>
           <div className="tip"><span>💡</span><p><b>В некоторых вопросах несколько ответов.</b> Программа предупредит об этом.</p></div>
+          <button className="catalog-button" onClick={() => setScreen("catalog")}>
+            Сверить все вопросы и ответы
+          </button>
           {!!mistakeQuestions.length && <button className="text-button" onClick={clearMistakes}>Очистить список ошибок</button>}
+        </section>
+      )}
+
+      {screen === "catalog" && (
+        <section className="catalog-wrap">
+          <div className="catalog-heading">
+            <div>
+              <div className="eyebrow">Проверка базы</div>
+              <h1>Все вопросы и ответы</h1>
+              <p>Правильные варианты выделены зелёным. В исходных фотографиях отсутствуют вопросы №240–249.</p>
+            </div>
+            <button className="secondary-button" onClick={() => setScreen("start")}>На главную</button>
+          </div>
+          <input
+            className="catalog-search"
+            type="search"
+            value={catalogSearch}
+            onChange={(event) => setCatalogSearch(event.target.value)}
+            placeholder="Поиск по номеру, вопросу или ответу"
+            aria-label="Поиск по вопросам"
+          />
+          <div className="catalog-count">Показано: {catalogQuestions.length} из {QUESTIONS.length}</div>
+          <div className="catalog-list">
+            {catalogQuestions.map((item) => (
+              <article className="catalog-item" key={item.id}>
+                <div className="question-number">№ {item.id}</div>
+                <h2>{item.text}</h2>
+                <ol>
+                  {item.answers.map((answer, index) => (
+                    <li className={item.correct.includes(index) ? "is-correct" : ""} key={`${item.id}-${index}`}>
+                      {answer}
+                      {item.correct.includes(index) && <b>✓ правильный</b>}
+                    </li>
+                  ))}
+                </ol>
+              </article>
+            ))}
+          </div>
         </section>
       )}
 

@@ -1,5 +1,8 @@
 "use client";
 
+/* Plain images keep relative asset paths working on both hosted versions. */
+/* eslint-disable @next/next/no-img-element */
+
 import { useMemo, useState } from "react";
 
 type Question = {
@@ -312,6 +315,34 @@ const QUESTIONS: Question[] = [
   { id: 310, text: "Какой звуковой сигнал означает изменение курса вправо?", answers: ["Один короткий звук", "Два коротких звука", "Три коротких звука", "Один продолжительный звук"], correct: [0] },
 ];
 
+const QUESTION_IMAGE_GROUPS: Array<{ ids: number[]; page: string }> = [
+  { ids: [26], page: "photo_2023-08-15_17-30-33" },
+  { ids: [37, 38], page: "photo_2023-08-15_17-30-29" },
+  { ids: [125, 126, 127, 128, 129], page: "photo_2023-08-15_17-30-42" },
+  { ids: [130, 131, 132, 133, 134, 135], page: "photo_2023-08-15_17-30-43" },
+  { ids: [138, 139, 140], page: "photo_2023-08-15_17-30-45" },
+  { ids: [149], page: "photo_2023-08-15_17-30-46" },
+  { ids: [150, 151, 152, 153, 154], page: "photo_2023-08-15_17-30-47" },
+  { ids: [155, 156, 158, 159], page: "photo_2023-08-15_17-30-48" },
+  { ids: [160, 161, 162, 163, 164], page: "photo_2023-08-15_17-30-49" },
+  { ids: [165, 166, 167, 168], page: "photo_2023-08-15_17-30-50" },
+  { ids: [169, 170, 171, 172], page: "photo_2023-08-15_17-30-51" },
+  { ids: [173, 174], page: "photo_2023-08-15_17-30-52" },
+  { ids: [210, 211, 212], page: "photo_2023-08-15_17-30-58" },
+  { ids: [213, 214, 215], page: "photo_2023-08-15_17-30-59" },
+  { ids: [216, 217, 218], page: "photo_2023-08-15_17-31-01" },
+  { ids: [219, 220, 221, 222], page: "photo_2023-08-15_17-31-02" },
+  { ids: [223, 224, 225, 226], page: "photo_2023-08-15_17-31-06" },
+  { ids: [227, 228, 229, 230], page: "photo_2023-08-15_17-31-04" },
+  { ids: [231, 232, 233, 234], page: "photo_2023-08-15_17-31-05" },
+  { ids: [235, 236, 237], page: "photo_2023-08-15_17-31-02 (2)" },
+  { ids: [238, 239], page: "photo_2023-08-15_17-31-03" },
+];
+
+const QUESTION_IMAGE_BY_ID = new Map(
+  QUESTION_IMAGE_GROUPS.flatMap(({ ids, page }) => ids.map((id) => [id, `question-pages/${page}.jpg`] as const)),
+);
+
 type Screen = "start" | "quiz" | "result" | "catalog";
 
 function sameAnswers(selected: number[], correct: number[]) {
@@ -489,6 +520,12 @@ export default function Home() {
               <article className="catalog-item" key={item.id}>
                 <div className="question-number">№ {item.id}</div>
                 <h2>{item.text}</h2>
+                {QUESTION_IMAGE_BY_ID.has(item.id) && (
+                  <a className="question-figure compact" href={QUESTION_IMAGE_BY_ID.get(item.id)} target="_blank" rel="noreferrer">
+                    <img src={QUESTION_IMAGE_BY_ID.get(item.id)} alt={`Оригинальный рисунок к вопросу №${item.id}`} loading="lazy" />
+                    <span>Нажми на рисунок, чтобы увеличить</span>
+                  </a>
+                )}
                 <ol>
                   {item.answers.map((answer, index) => (
                     <li className={item.correct.includes(index) ? "is-correct" : ""} key={`${item.id}-${index}`}>
@@ -513,6 +550,12 @@ export default function Home() {
           <article className="question-card">
             <div className="question-number">№ {question.id}</div>
             <h2>{question.text}</h2>
+            {QUESTION_IMAGE_BY_ID.has(question.id) && (
+              <a className="question-figure" href={QUESTION_IMAGE_BY_ID.get(question.id)} target="_blank" rel="noreferrer">
+                <img src={QUESTION_IMAGE_BY_ID.get(question.id)} alt={`Оригинальный рисунок к вопросу №${question.id}`} />
+                <span>Нажми на рисунок, чтобы увеличить</span>
+              </a>
+            )}
             {isMultiple && <p className="multiple-note">Выбери несколько вариантов</p>}
             <div className="answers">
               {question.answers.map((answer, index) => {
